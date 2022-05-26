@@ -4,6 +4,8 @@ import api.models.Character;
 import io.cucumber.java.ru.И;
 import io.cucumber.java.ru.Когда;
 import io.cucumber.java.ru.Тогда;
+import io.qameta.allure.Attachment;
+import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -16,10 +18,12 @@ import static io.restassured.RestAssured.given;
 
 public class TestStepdefs {
 
+
     public static final RequestSpecification REQ_SPEC =
             new RequestSpecBuilder()
                     .setBaseUri("https://rickandmortyapi.com/api")
                     .setContentType(ContentType.JSON)
+                    .addFilter(new AllureRestAssured())
                     .build();
 
     @Когда("найден персонаж Морти Смит")
@@ -53,7 +57,7 @@ public class TestStepdefs {
                         .response();
         int colCharacterOnEpisode = (new JSONObject(lastEpisodeWithCharacterInfo.getBody().asString()).getJSONArray("characters").length() - 1);
         int lastCharacterOnEpisode = Integer.parseInt(new JSONObject(lastEpisodeWithCharacterInfo.getBody().asString()).getJSONArray("characters").get(colCharacterOnEpisode).toString().replaceAll("[^0-9]", ""));
-        return  lastCharacterOnEpisode;
+        return lastCharacterOnEpisode;
     }
 
     @Тогда("сравниваем местонахождение этого персонажа и Морти Смита")
@@ -69,7 +73,6 @@ public class TestStepdefs {
         Assert.assertEquals("Разное местонахождение", findCharacter().getLocation().getName(), location);
 
     }
-
 
     @Тогда("сравниваем рассу этого персонажа и Морти Смита")
     public void checkCharactersSpecies() {
